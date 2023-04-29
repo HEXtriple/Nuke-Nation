@@ -9,6 +9,28 @@ canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
 
+boot( )
+
+
+
+// ------------------------------------------------- init ------------------------------------------------- //
+
+function boot() {
+  //check if files have been saved
+  if (localStorage.getItem("munny") != null) {
+    munny = localStorage.getItem("munny");
+    lives = localStorage.getItem("lives");
+    time = localStorage.getItem("time");
+    game();
+  } else {
+    firstBoot();
+  }
+}
+
+function firstBoot(){
+  coreGameLoop();
+}
+
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
 const EASYMODEMUNNY = 500;
 const NORMALMODEMUNNY = 250;
@@ -92,9 +114,9 @@ function menu() {
 function saveGame() {
   localStorage.setItem("munny", munny);
   localStorage.setItem("lives", lives);
+  localStorage.setItem("time", time);
 }
 
-coreGameLoop();
 
 
 //------------------------------------------------- Game Loops -------------------------------------------------//
