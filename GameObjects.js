@@ -1,5 +1,28 @@
 //tower defense game objects
 
+class Enemy {
+  constructor(x, y, width, height, color, speed, health, damage, type) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.speed = speed;
+    this.health = health;
+    this.damage = damage;
+    this.type = type;
+  }
+
+  draw() {
+    c.fillStyle = this.color;
+    c.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  update() {
+    this.draw();
+  }
+}
+
 class Tower {
   constructor(x, y, width, height, color, range, damage, speed, cost, type) {
     this.x = x;

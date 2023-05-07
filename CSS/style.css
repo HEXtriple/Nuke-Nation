@@ -13,7 +13,7 @@ body {
   display: flex; /* Flex ger ett rutmönster */
   flex-direction: column;
   align-items: center; /* Justera mot horisontell mitt */
-  width: 100%;
+  width: 100vw;
   padding: 3%; /* Marginal mot webbläsarfönstret */
   margin-top: 10px;
   margin-bottom: 10px;
@@ -49,3 +49,5 @@ body {
   height: 85%;
   border: 1px solid black;
 }
+
+

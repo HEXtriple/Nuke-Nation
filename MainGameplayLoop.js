@@ -9,7 +9,7 @@ canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
 
-boot( )
+boot()
 
 
 

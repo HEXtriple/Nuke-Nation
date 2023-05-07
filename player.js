@@ -1,22 +1,14 @@
-import { Howl, Howler } from "./howler/dist/howler.js";
+/*!
+ *  Howler.js Audio Player Demo
+ *  howlerjs.com
+ *
+ *  (c) 2013-2020, James Simpson of GoldFire Studios
+ *  goldfirestudios.com
+ *
+ *  MIT License
+ */
 
-
-// ------------------------------------------------- Music ------------------------------------------------- //
-let gameoverSound = new Howl({
-  src: ["./sounds/gameover.mp3"],
-  volume: 0.5,
-});
-
-let backgroundMusic = new Howl({
-  src: ["./sounds/background.mp3"],
-  volume: 0.5,
-  loop: true,
-});
-
-function musicEngine(music) {
-  music.play();
-}
-
+// Cache references to DOM elements.
 var elms = ['track', 'timer', 'duration', 'playBtn', 'pauseBtn', 'prevBtn', 'nextBtn', 'playlistBtn', 'volumeBtn', 'progress', 'bar', 'wave', 'loading', 'playlist', 'list', 'volume', 'barEmpty', 'barFull', 'sliderBtn'];
 elms.forEach(function(elm) {
   window[elm] = document.getElementById(elm);
