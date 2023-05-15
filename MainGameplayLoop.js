@@ -1,5 +1,3 @@
-import "./GameObjects.js";
-import "./BeatsEngine.js";
 //Tower Defense Game
 let canvas = document.querySelector("canvas");
 canvas.width = window.innerWidth;
@@ -8,11 +6,7 @@ canvas.style.width = "100%";
 canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
-
 boot()
-
-
-
 // ------------------------------------------------- init ------------------------------------------------- //
 
 function boot() {

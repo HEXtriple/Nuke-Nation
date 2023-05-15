@@ -8,7 +8,7 @@ body {
   overflow: hidden;
 }
 
-#super-container {
+#game-container {
   /* Överordnad container som innehåller de mindre */
   display: flex; /* Flex ger ett rutmönster */
   flex-direction: column;
@@ -21,7 +21,7 @@ body {
   /* border: solid; */
 }
 
-#header-container {
+#game {
   /* Statisk text */
   display: flex;
   font-family: sans-serif;

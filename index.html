@@ -11,6 +11,7 @@
     
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    
   </head>
   <body>
     <div id="music-container">
@@ -55,17 +56,17 @@
       <script src="./howler/src/howler.core.js"></script>
       <script src="./siriwave.js"></script>
       <script src="./player.js"></script>
-
+    </div>
+    
+    <div id="game-container">
+      <div id="game">
+        <h2 id="header-text">Nuke Nation Tower Defense</h2>
+        <p id="timer"></p>
+      </div>
       <div id="canvas-container">
         <canvas id="canvas"></canvas>
       </div>
     </div>
-    <div id="super-container">
-      <div id="header-container">
-        <h2 id="header-text">Nuke Nation Tower Defense</h2>
-        <p id="timer"></p>
-      </div>
-      <script src="./MainGameplayLoop.js"></script>
-    </div>
+    <script src="./MainGameplayLoop.js"></script>
   </body>
 </html>
