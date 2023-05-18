@@ -9,8 +9,8 @@ let c = canvas.getContext("2d");
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
 
 let lives = 10;
+let score;
 let timer = document.getElementById("timer");
-let score = document.getElementById("score");
 let gameover = false;
 
 let xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
@@ -19,8 +19,8 @@ let yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 let yPosPaddel = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 let yPosPaddel2 = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
-const xPosPaddel = canvas.width/6;
-const xPosPaddel2 = canvas.width - canvas.width/6;
+const xPosPaddel = canvas.width / 6;
+const xPosPaddel2 = canvas.width - canvas.width / 6;
 
 // Hastighet för respektive kvadrat, i x- och y-led
 let dxDot = 3;
@@ -33,7 +33,6 @@ const sizeDot = 30;
 const heightSizePaddel = 200;
 const widthSizePaddel = 10;
 
-
 // Variabler som håller reda på respektive kvadrats mittkoordinat
 let xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
 let yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
@@ -43,15 +42,19 @@ let ticks = 0;
 let runtime = 0;
 const updateFrequency = 10; // millisekunder per steg
 
-/*
-let asdad ()=> setInterval( {
+
+//save these items in local storage every 5 seconds
+boot();
+
+let saveState = setInterval(function () {
   localStorage.setItem("lives", lives);
   localStorage.setItem("time", time);
-})1000;
-*/
+  localStorage.setItem("score", score);
+}, 5000);
 
-let myTimer = setInterval(update, updateFrequency);
-let myTimer2 = setInterval(PaddelAI, updateFrequency);
+let GameUpdater = setInterval(update, updateFrequency);
+let PaddleAIUpdater = setInterval(PaddelAI, updateFrequency);
+
 
 //------------------------------------------------- Paddle Game ------------------------------------------------- //
 document.onkeydown = function (e) {
@@ -66,22 +69,20 @@ document.onkeydown = function (e) {
   }
 };
 
-
-
 // Ritar upp kvadraterna
 function update() {
   // Håller koll på tiden som programmet varit igång
   ticks += 1;
   runtime = (ticks / 1000) * updateFrequency; // i sekunder
   timer.innerHTML = "Tid: " + runtime.toFixed(1) + " sekunder";
-  
+
   //GameSpeed
   if (runtime % 10 == 0) {
     dxDot += 1;
     dyDot += 1;
   }
 
-  clearCanvas()
+  clearCanvas();
   checkBounce();
   paddelCanvasCollide();
   paddelCollisionDetectionTM();
@@ -94,18 +95,18 @@ function update() {
   xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
   yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
-
   drawRects();
-  
 }
 
-function paddelCollisionDetectionTM(){
+function paddelCollisionDetectionTM() {
   //Paddel 1
   // check if the dot is within the horizontal range of the paddle
-  let dotWithinPaddleX = xPosDot + sizeDot > xPosPaddel && xPosDot < xPosPaddel + widthSizePaddel;
+  let dotWithinPaddleX =
+    xPosDot + sizeDot > xPosPaddel && xPosDot < xPosPaddel + widthSizePaddel;
 
   // check if the dot is within the vertical range of the paddle
-  let dotWithinPaddleY = yPosDot + sizeDot > yPosPaddel && yPosDot < yPosPaddel + heightSizePaddel;
+  let dotWithinPaddleY =
+    yPosDot + sizeDot > yPosPaddel && yPosDot < yPosPaddel + heightSizePaddel;
 
   // check if the dot overlaps with the paddle
   let dotOverlapsPaddle = dotWithinPaddleX && dotWithinPaddleY;
@@ -115,13 +116,14 @@ function paddelCollisionDetectionTM(){
     dxDot = -dxDot;
   }
 
-
   //Paddel 2
   // check if the dot is within the horizontal range of the second paddle
-  let dotWithinPaddle2X = xPosDot + sizeDot > xPosPaddel2 && xPosDot < xPosPaddel2 + widthSizePaddel;
+  let dotWithinPaddle2X =
+    xPosDot + sizeDot > xPosPaddel2 && xPosDot < xPosPaddel2 + widthSizePaddel;
 
   // check if the dot is within the vertical range of the second paddle
-  let dotWithinPaddle2Y = yPosDot + sizeDot > yPosPaddel2 && yPosDot < yPosPaddel2 + heightSizePaddel;
+  let dotWithinPaddle2Y =
+    yPosDot + sizeDot > yPosPaddel2 && yPosDot < yPosPaddel2 + heightSizePaddel;
 
   // check if the dot overlaps with the second paddle
   let dotOverlapsPaddle2 = dotWithinPaddle2X && dotWithinPaddle2Y;
@@ -130,31 +132,29 @@ function paddelCollisionDetectionTM(){
   if (dotOverlapsPaddle2) {
     dxDot = -dxDot;
   }
-
-  
 }
 
-function paddelCanvasCollide(){
+function paddelCanvasCollide() {
   //Stop the paddle1 from going out of the canvas
-  if (yPosPaddel < 0 ) {
+  if (yPosPaddel < 0) {
     yPosPaddel = 0;
   }
 
-  if (yPosPaddel > canvas.height - heightSizePaddel ) {
+  if (yPosPaddel > canvas.height - heightSizePaddel) {
     yPosPaddel = canvas.height - heightSizePaddel;
   }
 
   //Stop the paddle2 from going out of the canvas
-  if (yPosPaddel2 < 0 ) {
+  if (yPosPaddel2 < 0) {
     yPosPaddel2 = 0;
   }
 
-  if (yPosPaddel2 > canvas.height - heightSizePaddel ) {
+  if (yPosPaddel2 > canvas.height - heightSizePaddel) {
     yPosPaddel2 = canvas.height - heightSizePaddel;
   }
 }
 
-// Då respektive kvadrat kommer till en ytterkant ska de studsa
+//Check for edge bounce
 function checkBounce() {
   if (xPosDot < 0 || xPosDot > canvas.width - sizeDot) {
     dxDot = -dxDot;
@@ -165,35 +165,32 @@ function checkBounce() {
   }
 
   if (xPosDot < 0) {
-    lives--;    
+    lives--;
   }
-  
+
   if (xPosDot > canvas.width - sizeDot) {
     score++;
-    
   }
 }
 
-function checkStatus(){
-  if(lives <= 0){
+function checkStatus() {
+  if (lives <= 0) {
     alert("AI wins!");
     document.location.reload();
   }
 
-  if (score == 3){
+  if (score == 3) {
     alert("Player wins!");
     document.location.reload();
   }
 }
 
-
-
 function clearCanvas() {
-  c.fillStyle = "rgba(0, 0, 0, 0.2)"
-  c.fillRect(0, 0, canvas.width, canvas.height)
+  c.fillStyle = "rgba(0, 0, 0, 0.2)";
+  c.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawRects(){
+function drawRects() {
   // Den röda kvadraten ritas i sitt nya läge
   c.fillStyle = "red";
   c.fillRect(xPosDot, yPosDot, sizeDot, sizeDot);
@@ -207,7 +204,7 @@ function drawRects(){
   c.fillRect(xPosPaddel2, yPosPaddel2, widthSizePaddel, heightSizePaddel);
 }
 
-function PaddelAI(){
+function PaddelAI() {
   if (yPosPaddel2 < yCenterDot) {
     yPosPaddel2 = yPosPaddel2 + paddelspeed;
   }
@@ -221,8 +218,9 @@ function PaddelAI(){
 
 function boot() {
   //check if files have been saved
-  if (localStorage.getItem("lives") != null) {
+  if (localStorage.getItem("score") != null) {
     lives = localStorage.getItem("lives");
+    score = localStorage.getItem("score");
     time = localStorage.getItem("time");
     game();
   } else {
@@ -231,11 +229,6 @@ function boot() {
 }
 
 function firstBoot() {
-  coreGameLoop();
-}
-
-
-function starterScreen() {
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
   c.font = "30px Arial";
@@ -247,23 +240,18 @@ function starterScreen() {
     canvas.width / 2,
     canvas.height / 2 + 100
   );
-  c.fillText(
-    "Press for nuke pong",
-    canvas.width / 2,
-    canvas.height / 2 + 200
-  );
+  c.fillText("Press for nuke pong", canvas.width / 2, canvas.height / 2 + 200);
 }
-
 
 //------------------------------------------------- Game Loops -------------------------------------------------//
 
 function healthBar() {
   c.fillStyle = "red";
-  c.fillRect(canvas.width/4, 0, (canvas.width), 10);
+  c.fillRect(canvas.width / 4, 0, canvas.width, 10);
 
   //depends on lives
   c.fillStyle = "green";
-  c.fillRect(canvas.width/4, 0, (canvas.width), 10);
+  c.fillRect(canvas.width / 4, 0, canvas.width, 10);
 
   c.fillStyle = "white";
   c.font = "30px Arial";
@@ -271,6 +259,8 @@ function healthBar() {
 }
 
 function scoreTracking() {
+  c.fillStyle = "white";
+  c.font = "30px Arial";
   c.fillText("Score: " + score, 10, 50);
   if (lives <= 0) {
     clearInterval(timerInterval);
@@ -278,7 +268,6 @@ function scoreTracking() {
     gameoverScreen();
   }
 }
-
 
 // ------------------------------------------------- Game Objects  ------------------------------------------------- //
 
@@ -291,46 +280,4 @@ function drawMap() {
     c.drawImage(map, 0, 0);
   };
 }
-
-//Enemy 0 
-const enemy0 = new Image();
-enemy0.src = "./Objects/Enemies/EnemyLVL0.png";
-
-function drawEnemy0() {
-  enemy0.onload = () => {
-    c.drawImage(enemy0, 0, 0);
-  };
-}
-
-//Enemy 1
-const enemy1 = new Image();
-enemy1.src = "./Objects/Enemies/EnemyLVL1.png";
-
-function drawEnemy1() {
-  enemy1.onload = () => {
-    c.drawImage(enemy1, 0, 0, canvas.width, canvas.height);
-  };
-}
-
-//Enemy 2
-const enemy2 = new Image();
-enemy2.src = "./Objects/Enemies/EnemyLVL2.png";
-
-function drawEnemy2() {
-  enemy2.onload = () => {
-    c.drawImage(enemy2, 0, 0, canvas.width, canvas.height);
-  };
-}
-
-//Enemy 3
-const enemy3 = new Image();
-enemy3.src = "./Objects/Enemies/EnemyLVL3.png";
-
-function drawEnemy3() {
-  enemy3.onload = () => {
-    c.drawImage(enemy3, 0, 0, canvas.width, canvas.height);
-  };
-}
-
-
 
