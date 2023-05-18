@@ -9,7 +9,8 @@ let c = canvas.getContext("2d");
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
 
 let lives = 10;
-let score;
+let score = 0;
+let round = 3;
 let timer = document.getElementById("timer");
 let gameover = false;
 
@@ -40,7 +41,7 @@ let yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 // Variabler för tidsmätning
 let ticks = 0;
 let runtime = 0;
-const updateFrequency = 10; // millisekunder per steg
+const updateFrequency = 1; // millisekunder per steg
 
 
 //save these items in local storage every 5 seconds
@@ -71,24 +72,16 @@ document.onkeydown = function (e) {
 
 // Ritar upp kvadraterna
 function update() {
-  // Håller koll på tiden som programmet varit igång
-  ticks += 1;
-  runtime = (ticks / 1000) * updateFrequency; // i sekunder
-  timer.innerHTML = "Tid: " + runtime.toFixed(1) + " sekunder";
-
-  //GameSpeed
-  if (runtime % 10 == 0) {
-    dxDot += 1;
-    dyDot += 1;
-  }
-
+  
+  ticking();
   clearCanvas();
   checkBounce();
+  checkStatus();
   paddelCanvasCollide();
   paddelCollisionDetectionTM();
   healthBar();
+  scoreTracking();
 
-  // Beräkna nytt läge
   xPosDot += dxDot;
   yPosDot += dyDot;
 
@@ -96,6 +89,19 @@ function update() {
   yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
   drawRects();
+}
+
+function ticking(){
+  // Håller koll på tiden som programmet varit igång
+  ticks += 1;
+  runtime = (ticks / 100) * updateFrequency; // i sekunder
+  timer.innerHTML = "Tid: " + runtime.toFixed(1) + " sekunder";
+
+  //GameSpeed
+  if (runtime % 10 == 0) {
+    dxDot += 1;
+    dyDot += 1;
+  }
 }
 
 function paddelCollisionDetectionTM() {
@@ -174,14 +180,19 @@ function checkBounce() {
 }
 
 function checkStatus() {
+  if (round == 11){
+    alert("Player wins!");
+    document.location.reload();
+
+  } 
   if (lives <= 0) {
     alert("AI wins!");
     document.location.reload();
   }
 
-  if (score == 3) {
-    alert("Player wins!");
-    document.location.reload();
+  if (score == round) {
+    round += 2;
+    alert("Round " + round + "!");
   }
 }
 
@@ -247,21 +258,23 @@ function firstBoot() {
 
 function healthBar() {
   c.fillStyle = "red";
-  c.fillRect(canvas.width / 4, 0, canvas.width, 10);
+  c.fillRect(canvas.width / 4, 0, canvas.width/2, 10);
 
-  //depends on lives
+  //Draw the green health bar, the width is depended on the current health
   c.fillStyle = "green";
-  c.fillRect(canvas.width / 4, 0, canvas.width, 10);
+  c.fillRect(canvas.width / 4, 0, (canvas.width/2) * (lives/10), 10);
+
+
 
   c.fillStyle = "white";
   c.font = "30px Arial";
-  c.fillText("Lives: " + lives, 10, 100);
+  c.fillText("Lives: " + lives, 100, 100);
 }
 
 function scoreTracking() {
   c.fillStyle = "white";
   c.font = "30px Arial";
-  c.fillText("Score: " + score, 10, 50);
+  c.fillText("Score: " + score, 100, 125);
   if (lives <= 0) {
     clearInterval(timerInterval);
     clearInterval(gameInterval);
@@ -270,6 +283,20 @@ function scoreTracking() {
 }
 
 // ------------------------------------------------- Game Objects  ------------------------------------------------- //
+
+function generate_random_colliders() {
+  let colliders = [];
+  for (let i = 0; i < 10; i++) {
+    let collider = {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      width: 50,
+      height: 50,
+    };
+    colliders.push(collider);
+  }
+  return colliders;
+}
 
 //Draw Map
 const map = new Image();
