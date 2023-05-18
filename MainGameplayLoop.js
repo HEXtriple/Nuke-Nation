@@ -6,7 +6,9 @@ canvas.style.width = "100%";
 canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
-boot()
+//boot()
+coreGameLoop();
+
 // ------------------------------------------------- init ------------------------------------------------- //
 
 function boot() {
@@ -161,7 +163,6 @@ function coreGameLoop() {
 
 // ------------------------------------------------- End Game ------------------------------------------------- //
 function gameoverScreen() {
-  gameoverSound.play();
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
   c.font = "30px Arial";

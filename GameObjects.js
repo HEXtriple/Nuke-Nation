@@ -1,12 +1,11 @@
 //tower defense game objects
 
 class Enemy {
-  constructor(x, y, width, height, color, speed, health, damage, type) {
+  constructor(x, y, width, height, speed, health, damage, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.color = color;
     this.speed = speed;
     this.health = health;
     this.damage = damage;
@@ -24,12 +23,11 @@ class Enemy {
 }
 
 class Tower {
-  constructor(x, y, width, height, color, range, damage, speed, cost, type) {
+  constructor(x, y, width, height, range, damage, speed, cost, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
-    this.color = color;
     this.range = range;
     this.damage = damage;
     this.speed = speed;
@@ -85,4 +83,12 @@ class selectionMarker {
   update() {
     this.draw();
   }
+}
+
+const map = new Image();
+//Draw Map
+function drawMap() {
+  map.onload = () => {
+    c.drawImage(map, 0, 0, canvas.width, canvas.height);
+  } 
 }
