@@ -3,7 +3,7 @@
 div#music-container {
   display:block;
   position: absolute;
-  top:5%;
+  top:0%;
   left: 0%;
   width: 25vw;
   height: 10vw;
@@ -22,29 +22,6 @@ div#music-container {
   top: 0;
   left: 3%;
   text-align: center;
-  font-size: 26px;
-  opacity: 0.9;
-  font-weight: 300;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.33);
-}
-
-#timer {
-  position: absolute;
-  top: 0;
-  right: 3%;
-  text-align: left;
-  font-size: 26px;
-  opacity: 0.9;
-  font-weight: 300;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.33);
-}
-#duration {
-  position: absolute;
-  top: 0;
-  right: 3%;
-  text-align: right;
   font-size: 26px;
   opacity: 0.9;
   font-weight: 300;

@@ -8,7 +8,6 @@ let c = canvas.getContext("2d");
 
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
 
-let munny = 0;
 let lives = 10;
 let timer = document.getElementById("timer");
 let score = document.getElementById("score");
@@ -46,7 +45,6 @@ const updateFrequency = 10; // millisekunder per steg
 
 /*
 let asdad ()=> setInterval( {
-  localStorage.setItem("munny", munny);
   localStorage.setItem("lives", lives);
   localStorage.setItem("time", time);
 })1000;
@@ -103,14 +101,37 @@ function update() {
 
 function paddelCollisionDetectionTM(){
   //Paddel 1
-  if (xPosDot + sizeDot > xPosPaddel && xPosDot < xPosPaddel + widthSizePaddel && yPosDot + sizeDot > yPosPaddel && yPosDot < yPosPaddel + heightSizePaddel) {
+  // check if the dot is within the horizontal range of the paddle
+  let dotWithinPaddleX = xPosDot + sizeDot > xPosPaddel && xPosDot < xPosPaddel + widthSizePaddel;
+
+  // check if the dot is within the vertical range of the paddle
+  let dotWithinPaddleY = yPosDot + sizeDot > yPosPaddel && yPosDot < yPosPaddel + heightSizePaddel;
+
+  // check if the dot overlaps with the paddle
+  let dotOverlapsPaddle = dotWithinPaddleX && dotWithinPaddleY;
+
+  // if the dot overlaps with the paddle, reverse its horizontal direction
+  if (dotOverlapsPaddle) {
     dxDot = -dxDot;
   }
 
+
   //Paddel 2
-  if (xPosDot + sizeDot > xPosPaddel2 && xPosDot < xPosPaddel2 + widthSizePaddel && yPosDot + sizeDot > yPosPaddel2 && yPosDot < yPosPaddel2 + heightSizePaddel) {
+  // check if the dot is within the horizontal range of the second paddle
+  let dotWithinPaddle2X = xPosDot + sizeDot > xPosPaddel2 && xPosDot < xPosPaddel2 + widthSizePaddel;
+
+  // check if the dot is within the vertical range of the second paddle
+  let dotWithinPaddle2Y = yPosDot + sizeDot > yPosPaddel2 && yPosDot < yPosPaddel2 + heightSizePaddel;
+
+  // check if the dot overlaps with the second paddle
+  let dotOverlapsPaddle2 = dotWithinPaddle2X && dotWithinPaddle2Y;
+
+  // if the dot overlaps with the second paddle, reverse its horizontal direction
+  if (dotOverlapsPaddle2) {
     dxDot = -dxDot;
   }
+
+  
 }
 
 function paddelCanvasCollide(){
@@ -144,16 +165,27 @@ function checkBounce() {
   }
 
   if (xPosDot < 0) {
-    lives--;
-    alert("AI wins!");
-    document.location.reload();
+    lives--;    
   }
   
   if (xPosDot > canvas.width - sizeDot) {
+    score++;
+    
+  }
+}
+
+function checkStatus(){
+  if(lives <= 0){
+    alert("AI wins!");
+    document.location.reload();
+  }
+
+  if (score == 3){
     alert("Player wins!");
     document.location.reload();
   }
 }
+
 
 
 function clearCanvas() {
@@ -189,8 +221,7 @@ function PaddelAI(){
 
 function boot() {
   //check if files have been saved
-  if (localStorage.getItem("munny") != null) {
-    munny = localStorage.getItem("munny");
+  if (localStorage.getItem("lives") != null) {
     lives = localStorage.getItem("lives");
     time = localStorage.getItem("time");
     game();
@@ -227,8 +258,12 @@ function starterScreen() {
 //------------------------------------------------- Game Loops -------------------------------------------------//
 
 function healthBar() {
+  c.fillStyle = "red";
+  c.fillRect(canvas.width/4, 0, (canvas.width), 10);
+
+  //depends on lives
   c.fillStyle = "green";
-  c.fillRect(0, 0, 100, 10);
+  c.fillRect(canvas.width/4, 0, (canvas.width), 10);
 
   c.fillStyle = "white";
   c.font = "30px Arial";
@@ -237,7 +272,6 @@ function healthBar() {
 
 function scoreTracking() {
   c.fillText("Score: " + score, 10, 50);
-  c.fillText("Munny: " + munny, 10, 150);
   if (lives <= 0) {
     clearInterval(timerInterval);
     clearInterval(gameInterval);
@@ -258,7 +292,7 @@ function drawMap() {
   };
 }
 
-///Enemy 0 
+//Enemy 0 
 const enemy0 = new Image();
 enemy0.src = "./Objects/Enemies/EnemyLVL0.png";
 
