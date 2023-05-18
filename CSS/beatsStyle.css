@@ -5,7 +5,6 @@ div#music-container {
   position: absolute;
   top:5%;
   left: 0%;
-  overflow: hidden;
   width: 25vw;
   height: 10vw;
   padding: 0;

@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Nuke Tower</title>
+    <title>Nuke Pong</title>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="./CSS/beatsStyle.css" />
     <link rel="stylesheet" href="./CSS/style.css" />
-
-    
   </head>
   <body>
     <div id="music-container">
@@ -43,29 +41,21 @@
         <div id="list"></div>
       </div>
 
-      <!-- Volume -->
-      <div id="volume" class="fadeout">
-        <div id="barFull" class="bar"></div>
-        <div id="barEmpty" class="bar"></div>
-        <div id="sliderBtn"></div>
-      </div>
-
       <!-- Scripts -->
       <script src="./howler/src/howler.core.js"></script>
       <script src="./siriwave.js"></script>
       <script src="./player.js"></script>
     </div>
-    
+
     <div id="game-container">
       <div id="game">
-        <h2 id="header-text">Nuke Nation Tower Defense</h2>
-        <p id="timer"></p>
+        <h2 id="header-text">Nuke Nation Pong Ballz</h2>
+        <p id="timer">TEst</p>
       </div>
       <div id="canvas-container">
         <canvas id="canvas"></canvas>
       </div>
     </div>
-    <script src="./MainGameplayLoop.js"></script>
-    
+    <script src="./Game.js"></script>
   </body>
 </html>
