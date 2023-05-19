@@ -6,14 +6,18 @@ canvas.style.width = "100%";
 canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
+boot();
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
 
+//
 let lives = 10;
 let score = 0;
 let round = 3;
 let timer = document.getElementById("timer");
 let gameover = false;
+let isPaused = false;
 
+//Generate random positions for the ball and paddles
 let xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
 let yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
@@ -23,11 +27,12 @@ let yPosPaddel2 = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 const xPosPaddel = canvas.width / 6;
 const xPosPaddel2 = canvas.width - canvas.width / 6;
 
-// Hastighet för respektive kvadrat, i x- och y-led
+// Variables for speed and direction
 let dxDot = 3;
 let dyDot = 2;
 
-let paddelspeed = 10;
+let paddleSpeed = 10;
+let paddleAiSpeed = 10;
 
 const sizeDot = 30;
 
@@ -38,14 +43,14 @@ const widthSizePaddel = 10;
 let xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
 let yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
-// Variabler för tidsmätning
+// Variables for timings
 let ticks = 0;
 let runtime = 0;
-const updateFrequency = 1; // millisekunder per steg
+const updateFrequency = 1; // millisecond per step
 
-
+let GameUpdater = setInterval(update, updateFrequency);
+let PaddleAIUpdater = setInterval(PaddelAI, updateFrequency);
 //save these items in local storage every 5 seconds
-boot();
 
 let saveState = setInterval(function () {
   localStorage.setItem("lives", lives);
@@ -53,32 +58,48 @@ let saveState = setInterval(function () {
   localStorage.setItem("score", score);
 }, 5000);
 
-let GameUpdater = setInterval(update, updateFrequency);
-let PaddleAIUpdater = setInterval(PaddelAI, updateFrequency);
-
-
 //------------------------------------------------- Paddle Game ------------------------------------------------- //
 document.onkeydown = function (e) {
   const key = e.key;
   switch (key) {
     case "ArrowUp":
-      yPosPaddel = yPosPaddel - paddelspeed;
-      break;
+      if (isPaused) {
+        return;
+      } else {
+        yPosPaddel = yPosPaddel - paddleSpeed;
+        break;
+      }
     case "ArrowDown":
-      yPosPaddel = yPosPaddel + paddelspeed;
+      if (isPaused) {
+        return;
+      } else {
+        yPosPaddel = yPosPaddel + paddleSpeed;
+        break;
+      }
+    //check for enter key
+    case "Enter":
+      isPaused = !isPaused;
       break;
   }
 };
 
-// Ritar upp kvadraterna
+// Draws the game objects on the canvas
 function update() {
-  
+  //check if game is paused
+  if (isPaused) {
+    return;
+  }
+
   ticking();
+
   clearCanvas();
+
   checkBounce();
   checkStatus();
+
   paddelCanvasCollide();
   paddelCollisionDetectionTM();
+
   healthBar();
   scoreTracking();
 
@@ -91,16 +112,17 @@ function update() {
   drawRects();
 }
 
-function ticking(){
-  // Håller koll på tiden som programmet varit igång
-  ticks += 1;
-  runtime = (ticks / 100) * updateFrequency; // i sekunder
-  timer.innerHTML = "Tid: " + runtime.toFixed(1) + " sekunder";
+function ticking() {
+  // Checks the time that has passed since the game started
+  ticks++;
+  runtime = (ticks / 100) * updateFrequency; // seconds
+  timer.innerHTML = "Time: " + runtime.toFixed(1) + "S"; // seconds
 
-  //GameSpeed
-  if (runtime % 10 == 0) {
-    dxDot += 1;
-    dyDot += 1;
+  //GameSpeed that increases every 30 seconds
+  if (runtime % 30 == 0 && runtime != 0) {
+    dxDot = dxDot * 1.2;
+    dyDot = dyDot * 1.2;
+    paddleSpeed = paddleSpeed * 1.2;
   }
 }
 
@@ -162,6 +184,9 @@ function paddelCanvasCollide() {
 
 //Check for edge bounce
 function checkBounce() {
+  //If the ball's position is less than 0, the ball is outside the left border.
+  //If the ball's position is greater than canvas.width, the ball is outside the right border.
+  //In both cases, the ball's direction is reversed.
   if (xPosDot < 0 || xPosDot > canvas.width - sizeDot) {
     dxDot = -dxDot;
   }
@@ -172,19 +197,20 @@ function checkBounce() {
 
   if (xPosDot < 0) {
     lives--;
+    generate_random_colliders();
   }
 
   if (xPosDot > canvas.width - sizeDot) {
     score++;
+    generate_random_colliders();
   }
 }
 
 function checkStatus() {
-  if (round == 11){
+  if (round == 11) {
     alert("Player wins!");
     document.location.reload();
-
-  } 
+  }
   if (lives <= 0) {
     alert("AI wins!");
     document.location.reload();
@@ -202,26 +228,26 @@ function clearCanvas() {
 }
 
 function drawRects() {
-  // Den röda kvadraten ritas i sitt nya läge
+  // The red dot (rectangle) is drawn in its new position
   c.fillStyle = "red";
   c.fillRect(xPosDot, yPosDot, sizeDot, sizeDot);
 
-  // Den vita paddeln (rektangel) ritas i sitt nya läge
+  // the white paddel (rectangle) is drawn in its new position
   c.fillStyle = "white";
   c.fillRect(xPosPaddel, yPosPaddel, widthSizePaddel, heightSizePaddel);
 
-  // Den vita paddeln (rektangel) ritas i sitt nya läge
+  // the white paddel (AI) (rectangle) is drawn in its new position
   c.fillStyle = "white";
   c.fillRect(xPosPaddel2, yPosPaddel2, widthSizePaddel, heightSizePaddel);
 }
 
 function PaddelAI() {
   if (yPosPaddel2 < yCenterDot) {
-    yPosPaddel2 = yPosPaddel2 + paddelspeed;
+    yPosPaddel2 = yPosPaddel2 + paddleAiSpeed;
   }
 
   if (yPosPaddel2 > yCenterDot) {
-    yPosPaddel2 = yPosPaddel2 - paddelspeed;
+    yPosPaddel2 = yPosPaddel2 - paddleAiSpeed;
   }
 }
 
@@ -233,7 +259,6 @@ function boot() {
     lives = localStorage.getItem("lives");
     score = localStorage.getItem("score");
     time = localStorage.getItem("time");
-    game();
   } else {
     firstBoot();
   }
@@ -245,26 +270,55 @@ function firstBoot() {
   c.font = "30px Arial";
   c.fillStyle = "white";
   c.textAlign = "center";
-  c.fillText("Welcome to Nuke-Nation", canvas.width / 2, canvas.height / 4);
   c.fillText(
-    "Press for normal pong",
+    "Welcome to Nuke-Nation Pong",
     canvas.width / 2,
-    canvas.height / 2 + 100
+    canvas.height / 4
   );
-  c.fillText("Press for nuke pong", canvas.width / 2, canvas.height / 2 + 200);
+  c.fillText(
+    "Remember to press Space to pause",
+    canvas.width / 2,
+    canvas.height / 2
+  );
+  c.fillText("Press Enter to start", canvas.width / 2, canvas.height / 1.5);
+  //check for enter key
+  //create async function
+  const work = async () => {
+    //wait for keypress
+    document.onkeydown = function (e) {
+      const key = e.key;
+      switch (key) {
+        case "Enter":
+          game_start_countdown();
+          break;
+      }
+    };
+  };
 }
 
 //------------------------------------------------- Game Loops -------------------------------------------------//
 
+function game_start_countdown() {
+  c.fillStyle = "black";
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  c.font = "30px Arial";
+  c.fillStyle = "white";
+  c.textAlign = "center";
+  c.fillText("3", canvas.width / 2, canvas.height / 4);
+  sleep(1000);
+  c.fillText("2", canvas.width / 2, canvas.height / 2);
+  sleep(1000);
+  c.fillText("1", canvas.width / 2, canvas.height / 1.5);
+  sleep(1000);
+}
+
 function healthBar() {
   c.fillStyle = "red";
-  c.fillRect(canvas.width / 4, 0, canvas.width/2, 10);
+  c.fillRect(canvas.width / 4, 0, canvas.width / 2, 10);
 
   //Draw the green health bar, the width is depended on the current health
   c.fillStyle = "green";
-  c.fillRect(canvas.width / 4, 0, (canvas.width/2) * (lives/10), 10);
-
-
+  c.fillRect(canvas.width / 4, 0, (canvas.width / 2) * (lives / 10), 10);
 
   c.fillStyle = "white";
   c.font = "30px Arial";
@@ -307,4 +361,3 @@ function drawMap() {
     c.drawImage(map, 0, 0);
   };
 }
-
