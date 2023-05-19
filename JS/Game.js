@@ -6,16 +6,18 @@ canvas.style.width = "100%";
 canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
-boot();
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
-
-//
 let lives = 10;
 let score = 0;
 let round = 3;
 let timer = document.getElementById("timer");
 let gameover = false;
-let isPaused = false;
+let isPaused = true;
+let isMenu = true;
+
+// Constant positions for the paddles
+const xPosPaddel = canvas.width / 6;
+const xPosPaddel2 = canvas.width - canvas.width / 6;
 
 //Generate random positions for the ball and paddles
 let xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
@@ -24,39 +26,27 @@ let yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 let yPosPaddel = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 let yPosPaddel2 = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
-const xPosPaddel = canvas.width / 6;
-const xPosPaddel2 = canvas.width - canvas.width / 6;
-
 // Variables for speed and direction
+// Variables that store the ball's speed
 let dxDot = 3;
 let dyDot = 2;
+let colorDot = "red";
+const sizeDot = 30;
+
+// Variables that store the ball's position
+let xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
+let yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
 let paddleSpeed = 10;
 let paddleAiSpeed = 10;
 
-const sizeDot = 30;
-
 const heightSizePaddel = 200;
 const widthSizePaddel = 10;
-
-// Variabler som håller reda på respektive kvadrats mittkoordinat
-let xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
-let yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
 // Variables for timings
 let ticks = 0;
 let runtime = 0;
 const updateFrequency = 1; // millisecond per step
-
-let GameUpdater = setInterval(update, updateFrequency);
-let PaddleAIUpdater = setInterval(PaddelAI, updateFrequency);
-//save these items in local storage every 5 seconds
-
-let saveState = setInterval(function () {
-  localStorage.setItem("lives", lives);
-  localStorage.setItem("time", time);
-  localStorage.setItem("score", score);
-}, 5000);
 
 //------------------------------------------------- Paddle Game ------------------------------------------------- //
 document.onkeydown = function (e) {
@@ -76,26 +66,29 @@ document.onkeydown = function (e) {
         yPosPaddel = yPosPaddel + paddleSpeed;
         break;
       }
-    //check for enter key
     case "Enter":
       isPaused = !isPaused;
+      break;
+    case " ":
+      isPaused = !isPaused;
+      isMenu = !isMenu;
+      menu
       break;
   }
 };
 
 // Draws the game objects on the canvas
 function update() {
+  if (isMenu) {
+    menu();
+  }
   //check if game is paused
   if (isPaused) {
     return;
   }
-
-  ticking();
-
-  clearCanvas();
-
-  checkBounce();
   checkStatus();
+  clearCanvas();
+  ticking();
 
   paddelCanvasCollide();
   paddelCollisionDetectionTM();
@@ -110,6 +103,9 @@ function update() {
   yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
   drawRects();
+
+  
+  checkBounce();
 }
 
 function ticking() {
@@ -142,6 +138,7 @@ function paddelCollisionDetectionTM() {
   // if the dot overlaps with the paddle, reverse its horizontal direction
   if (dotOverlapsPaddle) {
     dxDot = -dxDot;
+    changeColor();
   }
 
   //Paddel 2
@@ -159,6 +156,7 @@ function paddelCollisionDetectionTM() {
   // if the dot overlaps with the second paddle, reverse its horizontal direction
   if (dotOverlapsPaddle2) {
     dxDot = -dxDot;
+    changeColor();
   }
 }
 
@@ -197,12 +195,10 @@ function checkBounce() {
 
   if (xPosDot < 0) {
     lives--;
-    generate_random_colliders();
   }
 
   if (xPosDot > canvas.width - sizeDot) {
     score++;
-    generate_random_colliders();
   }
 }
 
@@ -229,9 +225,9 @@ function clearCanvas() {
 
 function drawRects() {
   // The red dot (rectangle) is drawn in its new position
-  c.fillStyle = "red";
+  c.fillStyle = colorDot;
   c.fillRect(xPosDot, yPosDot, sizeDot, sizeDot);
-
+  
   // the white paddel (rectangle) is drawn in its new position
   c.fillStyle = "white";
   c.fillRect(xPosPaddel, yPosPaddel, widthSizePaddel, heightSizePaddel);
@@ -239,6 +235,15 @@ function drawRects() {
   // the white paddel (AI) (rectangle) is drawn in its new position
   c.fillStyle = "white";
   c.fillRect(xPosPaddel2, yPosPaddel2, widthSizePaddel, heightSizePaddel);
+}
+
+
+function changeColor() {
+  // create an array of possible colors
+  let colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+  // get a random index from the array
+  let index = Math.floor(Math.random() * colors.length);
+  colorDot = colors[index];
 }
 
 function PaddelAI() {
@@ -251,20 +256,29 @@ function PaddelAI() {
   }
 }
 
-// ------------------------------------------------- init ------------------------------------------------- //
+//Generate random positions for the ball and paddles
+function generate_random_positions() {
+  let xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
+  let yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
-function boot() {
-  //check if files have been saved
-  if (localStorage.getItem("score") != null) {
-    lives = localStorage.getItem("lives");
-    score = localStorage.getItem("score");
-    time = localStorage.getItem("time");
-  } else {
-    firstBoot();
-  }
+  let yPosPaddel = Math.floor(
+    Math.random() * (0.8 * canvas.height - 200) + 200
+  );
+  let yPosPaddel2 = Math.floor(
+    Math.random() * (0.8 * canvas.height - 200) + 200
+  );
 }
 
-function firstBoot() {
+function game_ignition() {
+  generate_random_positions();
+  game_start_countdown();
+  return;
+}
+
+// ------------------------------------------------- init ------------------------------------------------- //
+
+function menu() {
+  clearCanvas();
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
   c.font = "30px Arial";
@@ -276,24 +290,13 @@ function firstBoot() {
     canvas.height / 4
   );
   c.fillText(
-    "Remember to press Space to pause",
+    "Remember to press enter to pause",
     canvas.width / 2,
     canvas.height / 2
   );
-  c.fillText("Press Enter to start", canvas.width / 2, canvas.height / 1.5);
+  c.fillText("Press space to exit/enter menu", canvas.width / 2, canvas.height / 1.5);
   //check for enter key
   //create async function
-  const work = async () => {
-    //wait for keypress
-    document.onkeydown = function (e) {
-      const key = e.key;
-      switch (key) {
-        case "Enter":
-          game_start_countdown();
-          break;
-      }
-    };
-  };
 }
 
 //------------------------------------------------- Game Loops -------------------------------------------------//
@@ -329,7 +332,7 @@ function scoreTracking() {
   c.fillStyle = "white";
   c.font = "30px Arial";
   c.fillText("Score: " + score, 100, 125);
-  if (lives <= 0) {
+  if (lives == 0) {
     clearInterval(timerInterval);
     clearInterval(gameInterval);
     gameoverScreen();
@@ -361,3 +364,10 @@ function drawMap() {
     c.drawImage(map, 0, 0);
   };
 }
+
+// ------------------------------------------------- Game Loops ------------------------------------------------- //
+
+
+let GameUpdater = setInterval(update, updateFrequency);
+let PaddleAIUpdater = setInterval(PaddelAI, updateFrequency);
+game_ignition();
