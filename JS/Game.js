@@ -7,9 +7,25 @@ canvas.style.height = "100%";
 let c = canvas.getContext("2d");
 
 // ------------------------------------------------- Game Variables ------------------------------------------------- //
-let lives = 10;
+const EASYMODELIVES = 100;
+const NORMALMODELIVES = 50;
+const HARDMODELIVES = 10;
+
+const EASYMODENEEDEDSCORE = 1;
+const NORMALMODENEEDEDSCORE = 3;
+const HARDMODENEEDEDSCORE = 5;
+
+const TYPEEASY = "Easy";
+const TYPENORMAL = "Normal";
+const TYPEHARD = "Hard";
+
+let firstIgnition = true;
+
+let lives = 0;
 let score = 0;
-let round = 3;
+let neededScore= 0;
+let healthBarType ="";
+
 let timer = document.getElementById("timer");
 let gameover = false;
 let isPaused = true;
@@ -67,13 +83,47 @@ document.onkeydown = function (e) {
         break;
       }
     case "Enter":
-      isPaused = !isPaused;
-      break;
+      if (firstIgnition) {
+        return;
+      }
+      else if (isMenu == true) {
+        return
+      }else{
+        isPaused = !isPaused;
+        break;
+      }
     case " ":
+      if (firstIgnition) {
+        return;
+      }
       isPaused = !isPaused;
       isMenu = !isMenu;
       menu
       break;
+
+    case "1":
+      if(firstIgnition){
+        lives = EASYMODELIVES;
+        neededScore = EASYMODENEEDEDSCORE;
+        healthBarType = TYPEEASY;
+        firstIgnition = false;
+      }
+
+    case "2":
+      if(firstIgnition){
+        lives = NORMALMODELIVES;
+        neededScore = NORMALMODENEEDEDSCORE;
+        healthBarType = TYPENORMAL;
+        firstIgnition = false;
+      }
+    
+    case "3":
+      if(firstIgnition){
+        lives = HARDMODELIVES;
+        neededScore = HARDMODENEEDEDSCORE; 
+        healthBarType = TYPEHARD;
+        firstIgnition = false;
+      }
   }
 };
 
@@ -86,7 +136,6 @@ function update() {
   if (isPaused) {
     return;
   }
-  checkStatus();
   clearCanvas();
   ticking();
 
@@ -102,10 +151,8 @@ function update() {
   xCenterDot = (xPosDot + xPosDot + sizeDot) / 2;
   yCenterDot = (yPosDot + yPosDot + sizeDot) / 2;
 
-  drawRects();
-
-  
   checkBounce();
+  drawRects();
 }
 
 function ticking() {
@@ -195,28 +242,15 @@ function checkBounce() {
 
   if (xPosDot < 0) {
     lives--;
+    game_ignition();
   }
 
   if (xPosDot > canvas.width - sizeDot) {
     score++;
+    game_ignition();
   }
 }
 
-function checkStatus() {
-  if (round == 11) {
-    alert("Player wins!");
-    document.location.reload();
-  }
-  if (lives <= 0) {
-    alert("AI wins!");
-    document.location.reload();
-  }
-
-  if (score == round) {
-    round += 2;
-    alert("Round " + round + "!");
-  }
-}
 
 function clearCanvas() {
   c.fillStyle = "rgba(0, 0, 0, 0.2)";
@@ -235,6 +269,10 @@ function drawRects() {
   // the white paddel (AI) (rectangle) is drawn in its new position
   c.fillStyle = "white";
   c.fillRect(xPosPaddel2, yPosPaddel2, widthSizePaddel, heightSizePaddel);
+
+  // the white collider (rectangle) is drawn in its 
+  //c.fillStyle = "white";
+  //c.fillRect(collider.x, collider.y, collider.width, collider.height);
 }
 
 
@@ -258,13 +296,13 @@ function PaddelAI() {
 
 //Generate random positions for the ball and paddles
 function generate_random_positions() {
-  let xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
-  let yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
+  xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
+  yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
-  let yPosPaddel = Math.floor(
+  yPosPaddel = Math.floor(
     Math.random() * (0.8 * canvas.height - 200) + 200
   );
-  let yPosPaddel2 = Math.floor(
+  yPosPaddel2 = Math.floor(
     Math.random() * (0.8 * canvas.height - 200) + 200
   );
 }
@@ -281,7 +319,7 @@ function menu() {
   clearCanvas();
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
-  c.font = "30px Arial";
+  c.font = "100px Arial";
   c.fillStyle = "white";
   c.textAlign = "center";
   c.fillText(
@@ -289,31 +327,22 @@ function menu() {
     canvas.width / 2,
     canvas.height / 4
   );
+  c.font = "40px Arial";
   c.fillText(
     "Remember to press enter to pause",
     canvas.width / 2,
     canvas.height / 2
   );
   c.fillText("Press space to exit/enter menu", canvas.width / 2, canvas.height / 1.5);
-  //check for enter key
-  //create async function
+  c.font = "20px Arial";
+  if (firstIgnition){
+    c.fillText("Press 1 for Easy", canvas.width / 4 , canvas.height / 1.25);
+    c.fillText("Press 2 for Normal", canvas.width / 2, canvas.height / 1.15);
+    c.fillText("Press 3 for Hard", 3*canvas.width / 4, canvas.height / 1.25);
+  }
 }
 
 //------------------------------------------------- Game Loops -------------------------------------------------//
-
-function game_start_countdown() {
-  c.fillStyle = "black";
-  c.fillRect(0, 0, canvas.width, canvas.height);
-  c.font = "30px Arial";
-  c.fillStyle = "white";
-  c.textAlign = "center";
-  c.fillText("3", canvas.width / 2, canvas.height / 4);
-  sleep(1000);
-  c.fillText("2", canvas.width / 2, canvas.height / 2);
-  sleep(1000);
-  c.fillText("1", canvas.width / 2, canvas.height / 1.5);
-  sleep(1000);
-}
 
 function healthBar() {
   c.fillStyle = "red";
@@ -321,38 +350,54 @@ function healthBar() {
 
   //Draw the green health bar, the width is depended on the current health
   c.fillStyle = "green";
-  c.fillRect(canvas.width / 4, 0, (canvas.width / 2) * (lives / 10), 10);
-
-  c.fillStyle = "white";
-  c.font = "30px Arial";
-  c.fillText("Lives: " + lives, 100, 100);
+  if(healthBarType == TYPEEASY){
+    c.fillRect(canvas.width / 4,0,(canvas.width / 2) * (lives / EASYMODELIVES),10);
+  }
+  if(healthBarType == TYPENORMAL){
+    c.fillRect(canvas.width / 4,0,(canvas.width / 2) * (lives / NORMALMODELIVES),10);
+  }
+  if(healthBarType == TYPEHARD){
+    c.fillRect(canvas.width / 4,0,(canvas.width / 2) * (lives / HARDMODELIVES),10);
+  }
+  
 }
 
 function scoreTracking() {
   c.fillStyle = "white";
   c.font = "30px Arial";
+  
   c.fillText("Score: " + score, 100, 125);
+  c.fillText("Lives: " + lives, 100, 100);
+
+  c.fillText("Needed score: " + neededScore, canvas.width - 200, 100);
   if (lives == 0) {
-    clearInterval(timerInterval);
-    clearInterval(gameInterval);
-    gameoverScreen();
+    clearInterval(GameUpdater);
+    clearInterval(PaddleAIUpdater);
+    alert("AI wins!");
+    document.location.reload();
+  }
+  if (score == neededScore) {
+    alert("Player wins!");
+    document.location.reload();
   }
 }
 
 // ------------------------------------------------- Game Objects  ------------------------------------------------- //
 
-function generate_random_colliders() {
-  let colliders = [];
-  for (let i = 0; i < 10; i++) {
-    let collider = {
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      width: 50,
-      height: 50,
-    };
-    colliders.push(collider);
-  }
-  return colliders;
+function generate_random_collider() {
+  let xPosCollider = Math.floor( Math.random() * (0.8 * canvas.width - 200) + 200);
+  let yPosCollider = Math.floor( Math.random() * (0.8 * canvas.height - 200) + 200);
+  let widthCollider = Math.floor( Math.random() * (0.8 * canvas.width - 200) + 200);
+  let heightCollider = Math.floor( Math.random() * (0.8 * canvas.height - 200) + 200);
+
+  let collider = {
+    x: xPosCollider,
+    y: yPosCollider,
+    width: widthCollider,
+    height: heightCollider,
+  };  
+  return collider;
+
 }
 
 //Draw Map
