@@ -385,18 +385,12 @@ function PaddelAI() {
 }
 
 //Generate random positions for the ball and paddles
-function generate_random_positions() {
+function game_ignition() {
   xPosDot = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
   yPosDot = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
 
   yPosPaddel = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
   yPosPaddel2 = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
-}
-
-function game_ignition() {
-  generate_random_positions();
-  game_start_countdown();
-  return;
 }
 
 // ------------------------------------------------- init ------------------------------------------------- //
@@ -485,6 +479,8 @@ function scoreTracking() {
     document.location.reload();
   }
   if (score == neededScore) {
+    clearInterval(GameUpdater);
+    clearInterval(PaddleAIUpdater);
     alert("Player wins!");
     document.location.reload();
   }
